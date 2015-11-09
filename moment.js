@@ -6,10 +6,26 @@ module.exports = function () {
         date: null,
 
         // А здесь часовой пояс
-        timezone: null,
+        cur_timezone: new Date().getTimezoneOffset() / 60,
+
+        get timezone () {
+            return this.cur_timezone;
+        },
+
+        set timezone (value) {
+            this.date.hours += value;
+            this.cur_timezone = value;
+        },
+
+        set dateOfMoment (value) {
+            this.date = value;
+        },
 
         // Выводит дату в переданном формате
         format: function (pattern) {
+            var str = pattern.replace('%DD', this.date['day']);
+            str = str.replace('%HH', this.date['time'].getHours());
+            return str.replace('%MM', this.date['time'].getMinutes());
         },
 
         // Возвращает кол-во времени между текущей датой и переданной `moment`
@@ -18,3 +34,4 @@ module.exports = function () {
         }
     };
 };
+
