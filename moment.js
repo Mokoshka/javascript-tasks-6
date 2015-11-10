@@ -6,6 +6,7 @@ module.exports = function () {
         date: null,
 
         // А здесь часовой пояс
+        //cur_timezone: -Math.floor(new Date().getTimezoneOffset() / 60),
         cur_timezone: -Math.floor(new Date().getTimezoneOffset() / 60),
 
         get timezone () {
@@ -23,10 +24,21 @@ module.exports = function () {
         // Выводит дату в переданном формате
         format: function (pattern) {
             //console.log(this.cur_timezone);
+            var ch;
             var time = toLocalTime(this.date, this.timezone);
             var str = pattern.replace('%DD', getWeekDay(time.day));
-            str = str.replace('%HH', time.hours);
-            return str.replace('%MM', time.minutes);
+            if (time.hours == 0) {
+                ch = time.hours.toString();
+                str = str.replace('%HH', ch + ch);
+            } else {
+                str = str.replace('%HH', time.hours);
+            }
+            if (time.minutes == 0) {
+                ch = time.minutes.toString();
+                return str.replace('%MM', ch + ch);
+            } else {
+                return str.replace('%MM', time.minutes);
+            }
         },
 
         // Возвращает кол-во времени между текущей датой и переданной `moment`
