@@ -26,7 +26,7 @@ module.exports = function () {
             //console.log(this.cur_timezone);
             var ch;
             var time = toLocalTime(this.date, this.timezone);
-            var str = pattern.replace('%DD', getWeekDay(time.day));
+            var str = pattern.replace('%DD', getWeekDay(time.day).toUpperCase());
             if (time.hours == 0) {
                 ch = time.hours.toString();
                 str = str.replace('%HH', ch + ch);
