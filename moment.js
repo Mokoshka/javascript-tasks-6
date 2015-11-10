@@ -48,7 +48,7 @@ function toLocalTime(date, timezone) {
         date.hours += 24;
         date.day -= 1;
     } else {
-        date.day = date.day +  Math.floor(date.hours / 24);
+        date.day = date.day + Math.floor(date.hours / 24);
         date.hours = date.hours % 24;
     }
     return date;
