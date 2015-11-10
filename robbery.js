@@ -50,7 +50,7 @@ function parse(string) {
     return -1;
 }
 
-function compare (time1, time2) {
+function compare(time1, time2) {
     if (time1.day == time2.day) {
         if (time1.hours == time2.hours) {
             if (time1.minutes == time2.minutes) {
@@ -76,7 +76,7 @@ function addMinutes(time, minutes) {
     minutes = time.minutes + minutes;
     var hours = time.hours + Math.floor(minutes / 60);
     minutes = minutes % 60;
-    var day = time.day +  Math.floor(hours / 24);
+    var day = time.day + Math.floor(hours / 24);
     hours = hours % 24;
     return {
         day: day,
@@ -92,7 +92,7 @@ function toUTC(date) {
         date.hours += 24;
         date.day -= 1;
     } else {
-        date.day = date.day +  Math.floor(date.hours / 24);
+        date.day = date.day + Math.floor(date.hours / 24);
         date.hours = date.hours % 24;
     }
     return date;
@@ -103,8 +103,9 @@ function findTime(gangs, minDuration, workingHouse) {
     var to = [];
     var begin = parse(workingHouse.from);
     var end = parse(workingHouse.to);
+    var i;
     for (var name in gangs) {
-        for (var i=0; i<gangs[name].length; i++) {
+        for (i = 0; i < gangs[name].length; i++) {
             from.push(parse(gangs[name][i].from));
             to.push(parse(gangs[name][i].to));
         }
@@ -118,7 +119,7 @@ function findTime(gangs, minDuration, workingHouse) {
     time[k].to = to[from.indexOf(current[k])];
     //console.log(current);
     var len = current.length;
-    for (i=1; i<len; i++) {
+    for (i = 1; i < len; i++) {
         if (compare(to[from.indexOf(current[i])], time[k].to) > 0) {
             if (compare(current[i], time[k].to) <= 0) {
                 time[k].to = to[from.indexOf(current[i])];
@@ -133,7 +134,8 @@ function findTime(gangs, minDuration, workingHouse) {
     var pointer = begin;
     i = 0;
     while (i <= k) {
-        if (compare(pointer, begin) >= 0 && compare(time[i].from, addMinutes(pointer, minDuration)) >= 0 &&
+        if (compare(pointer, begin) >= 0 &&
+            compare(time[i].from, addMinutes(pointer, minDuration)) >= 0 &&
             compare(end, addMinutes(pointer, minDuration)) >= 0) {
             return pointer;
         } else {
