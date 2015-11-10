@@ -7,7 +7,7 @@ module.exports = function () {
 
         // А здесь часовой пояс
         //cur_timezone: -Math.floor(new Date().getTimezoneOffset() / 60),
-        cur_timezone: -Math.floor(new Date().getTimezoneOffset() / 60),
+        cur_timezone: 5,
 
         get timezone () {
             return this.cur_timezone;
