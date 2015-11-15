@@ -24,7 +24,7 @@ module.exports = function () {
         // Выводит дату в переданном формате
         format: function (pattern) {
             if (this.date === undefined) {
-                return "Время не найдено";
+                return 'Время не найдено';
             }
             var time = toLocalTime(this.date, this.timezone);
             var str = pattern.replace('%DD', getWeekDay(time.day).toUpperCase());
