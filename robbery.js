@@ -105,7 +105,8 @@ function findTime(gangs, minDuration, workingHouse) {
     i = 0;
     while (i <= time.length) {
         if (i < time.length) {
-            if (pointer >= begin && time[i].from >= pointer + minDuration && end >= pointer + minDuration) {
+            if (pointer >= begin && time[i].from >= pointer + minDuration &&
+                end >= pointer + minDuration) {
                 return pointer;
             } else {
                 pointer = time[i].to;
@@ -119,7 +120,7 @@ function findTime(gangs, minDuration, workingHouse) {
             if (pointer >= begin && pointer + minDuration <= end) {
                 return pointer;
             }
-            i += 1;
+            i ++;
         }
     }
 }
