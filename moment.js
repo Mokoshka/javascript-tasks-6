@@ -23,22 +23,18 @@ module.exports = function () {
 
         // Выводит дату в переданном формате
         format: function (pattern) {
-            //console.log(this.cur_timezone);
-            var ch;
+            if (this.date === undefined) {
+                return "Время не найдено";
+            }
             var time = toLocalTime(this.date, this.timezone);
             var str = pattern.replace('%DD', getWeekDay(time.day).toUpperCase());
-            if (time.hours == 0) {
-                ch = time.hours.toString();
-                str = str.replace('%HH', ch + ch);
-            } else {
-                str = str.replace('%HH', time.hours);
-            }
-            if (time.minutes == 0) {
-                ch = time.minutes.toString();
-                return str.replace('%MM', ch + ch);
-            } else {
-                return str.replace('%MM', time.minutes);
-            }
+            var edin = time.hours % 10;
+            var des = (time.hours - edin) / 10;
+            str = str.replace('%HH', des.toString() + edin.toString());
+
+            edin = this.date.minutes % 10;
+            des = (this.date.minutes - edin) / 10;
+            return str.replace('%MM', des.toString() + edin.toString());
         },
 
         // Возвращает кол-во времени между текущей датой и переданной `moment`
@@ -55,13 +51,14 @@ function getWeekDay(day) {
 }
 
 function toLocalTime(date, timezone) {
-    date.hours += timezone;
-    if (date.hours < 0) {
-        date.hours += 24;
-        date.day -= 1;
-    } else {
-        date.day = date.day + Math.floor(date.hours / 24);
-        date.hours = date.hours % 24;
-    }
-    return date;
+    var hours = date.hours + timezone;
+    var day = date.day + Math.floor(hours / 24);
+    hours = hours % 24;
+    return {
+        day: day,
+        hours: hours,
+        minutes: date.minutes,
+        timezone: timezone,
+        valueOf: date.valueOf()
+    };
 }
