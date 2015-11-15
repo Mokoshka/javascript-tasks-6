@@ -6,7 +6,6 @@ var moment = require('./moment');
 module.exports.getAppropriateMoment = function (json, minDuration, workingHours) {
     var appropriateMoment = moment();
 
-    //console.log(appropriateMoment.timezone);
     // 1. Читаем json
     var gangs = JSON.parse(json);
     // 2. Находим подходящий ближайший момент начала ограбления
@@ -44,46 +43,13 @@ function parse(string) {
             day: checkDay(match[1]),
             hours: parseInt(match[2]),
             minutes: parseInt(match[3]),
-            timezone: parseInt(match[4])
+            timezone: parseInt(match[4]),
+            valueOf: function () {
+                return this.minutes + this.hours * 60 + this.day * 60 * 24;
+            }
         });
     }
     return -1;
-}
-
-function compare(time1, time2) {
-    if (time1.day == time2.day) {
-        if (time1.hours == time2.hours) {
-            if (time1.minutes == time2.minutes) {
-                return 0;
-            } else if (time1.minutes < time2.minutes) {
-                return -1;
-            } else {
-                return 1;
-            }
-        } else if (time1.hours < time2.hours) {
-            return -1;
-        } else {
-            return 1;
-        }
-    } else if (time1.day < time2.day) {
-        return -1;
-    } else {
-        return 1;
-    }
-}
-
-function addMinutes(time, minutes) {
-    minutes = time.minutes + minutes;
-    var hours = time.hours + Math.floor(minutes / 60);
-    minutes = minutes % 60;
-    var day = time.day + Math.floor(hours / 24);
-    hours = hours % 24;
-    return {
-        day: day,
-        hours: hours,
-        minutes: minutes,
-        timezone: time.timezone
-    };
 }
 
 function toUTC(date) {
@@ -103,6 +69,9 @@ function findTime(gangs, minDuration, workingHouse) {
     var to = [];
     var begin = parse(workingHouse.from);
     var end = parse(workingHouse.to);
+    if (end < begin) {
+        end.day += 1;
+    }
     var i;
     for (var name in gangs) {
         for (i = 0; i < gangs[name].length; i++) {
@@ -111,17 +80,18 @@ function findTime(gangs, minDuration, workingHouse) {
         }
     }
     var current = from.slice();
-    current.sort(compare);
+    current.sort(function (time1, time2) {
+        return time1 >= time2;
+    });
     var k = 0;
     var time = [];
     time[k] = {};
     time[k].from = current[k];
     time[k].to = to[from.indexOf(current[k])];
-    //console.log(current);
     var len = current.length;
     for (i = 1; i < len; i++) {
-        if (compare(to[from.indexOf(current[i])], time[k].to) > 0) {
-            if (compare(current[i], time[k].to) <= 0) {
+        if (to[from.indexOf(current[i])] > time[k].to) {
+            if (current[i] <= time[k].to) {
                 time[k].to = to[from.indexOf(current[i])];
             } else {
                 k += 1;
@@ -133,20 +103,23 @@ function findTime(gangs, minDuration, workingHouse) {
     }
     var pointer = begin;
     i = 0;
-    while (i <= k) {
-        if (compare(pointer, begin) >= 0 &&
-            compare(time[i].from, addMinutes(pointer, minDuration)) >= 0 &&
-            compare(end, addMinutes(pointer, minDuration)) >= 0) {
-            return pointer;
-        } else {
-            pointer = time[i].to;
-            if (compare(pointer, end) >= 0) {
-                begin.day += 1;
-                end.day += 1;
-                pointer = begin;
+    while (i <= time.length) {
+        if (i < time.length) {
+            if (pointer >= begin && time[i].from >= pointer + minDuration && end >= pointer + minDuration) {
+                return pointer;
             } else {
+                pointer = time[i].to;
+                if (pointer >= end) {
+                    begin.day += 1;
+                    end.day += 1;
+                }
                 i += 1;
             }
+        } else {
+            if (pointer >= begin && pointer + minDuration <= end) {
+                return pointer;
+            }
+            i += 1;
         }
     }
 }
