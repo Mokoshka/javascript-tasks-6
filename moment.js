@@ -27,6 +27,7 @@ module.exports = function () {
                 return 'Время не найдено';
             }
             var time = toLocalTime(this.date, this.timezone);
+            console.log(time);
             var str = pattern.replace('%DD', getWeekDay(time.day).toUpperCase());
             var edin = time.hours % 10;
             var des = (time.hours - edin) / 10;
@@ -52,8 +53,14 @@ function getWeekDay(day) {
 
 function toLocalTime(date, timezone) {
     var hours = date.hours + timezone;
-    var day = date.day + Math.floor(hours / 24);
-    hours = hours % 24;
+    var day;
+    if (hours < 0) {
+        hours = 24 + hours;
+        day = date.day - 1;
+    } else {
+        day = date.day + Math.floor(hours / 24);
+        hours = hours % 24;
+    }
     return {
         day: day,
         hours: hours,
