@@ -54,7 +54,7 @@ function parse(string) {
 
 function toUTC(date) {
     date.hours -= date.timezone;
-    if (date.hours < 0) {
+    if (date.hours <= 0) {
         date.hours += 24;
         date.day -= 1;
     } else {
@@ -109,10 +109,16 @@ function findTime(gangs, minDuration, workingHouse) {
                 end >= pointer + minDuration) {
                 return pointer;
             } else {
-                pointer = time[i].to;
+                if (time[i].to > begin) {
+                    pointer = time[i].to;
+                }
                 if (pointer >= end) {
                     begin.day += 1;
                     end.day += 1;
+                    if (pointer <= begin) {
+                        console.log('begin: ', begin);
+                        pointer = begin;
+                    }
                 }
                 i += 1;
             }
